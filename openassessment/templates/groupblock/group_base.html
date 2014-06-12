@@ -1,0 +1,28 @@
+{% load i18n %}
+{% spaceless %}
+    <div id="group__base" class="group__join">
+        <h2>{{ title }}</h2>
+        <p>{{ prompt }}</p>
+        <form id="join_group_form">
+            <ul>
+                <li class="group__join_list">
+                    <label for="group__student_name" class="label">{% trans "Name" %}</label>
+                </li>
+                <li class="group__join_list">
+                    <input id="group__student_name" type="text" class="value" maxlength="120">
+                </li>
+                <li class="group__join_list">
+                    <label for="group__student_email" class="label">{% trans "Email Address" %}</label>
+                </li>
+                <li class="group__join_list">
+                    <input id="group__student_email" type="text" class="value" maxlength="120">
+                </li>
+            </ul>
+            <ul class="list list--actions">
+                <li class="list--actions__item">
+                    <a aria-role="button" href="" id="submit_join_group" class="action--submit"><span class="copy">{% trans "Submit" %}</span></a>
+                </li>
+            </ul>
+        </form>
+    </div>
+{% endspaceless %}

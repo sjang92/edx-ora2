@@ -4,6 +4,8 @@ from setuptools import setup
 PACKAGES = [
     'openassessment',
     'openassessment.assessment',
+    'openassessment.groups',
+    'openassessment.group_xblock',
     'openassessment.workflow',
     'openassessment.management',
     'openassessment.xblock'
@@ -46,6 +48,7 @@ setup(
     entry_points={
         'xblock.v1': [
             'openassessment = openassessment.xblock.openassessmentblock:OpenAssessmentBlock',
+            'group = openassessment.group_xblock.groupblock:GroupBlock',
         ]
     },
 )

@@ -131,6 +131,7 @@ INSTALLED_APPS = (
     # ora2 apps
     'submissions',
     'openassessment',
+    'openassessment.groups',
     'openassessment.workflow',
     'openassessment.assessment',
 )

@@ -8,6 +8,7 @@ from .base import *     # pylint:disable=W0614,W0401
 TEST_APPS = (
     'openassessment',
     'openassessment.assessment',
+    'openassessment.groups',
     'openassessment.workflow',
     'openassessment.xblock',
 )
