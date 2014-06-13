@@ -282,6 +282,29 @@ OpenAssessment.Server.prototype = {
         }).promise();
     },
 
+    groupAssess: function(optionsSelected, criterionFeedback, overallFeedback) {
+        var url = this.url('group_assess');
+        var payload = JSON.stringify({
+            options_selected: optionsSelected,
+            criterion_feedback: criterionFeedback,
+            overall_feedback: overallFeedback
+        });
+        return $.Deferred(function(defer) {
+            $.ajax({ type: "POST", url: url, data: payload }).done(
+                function(data) {
+                    if (data.success) {
+                        defer.resolve();
+                    }
+                    else {
+                        defer.rejectWith(this, [data.msg]);
+                    }
+                }
+            ).fail(function(data) {
+                    defer.rejectWith(this, [gettext('This assessment could not be submitted.')]);
+                });
+        }).promise();
+    },
+
     /**
     Send a self-assessment to the XBlock.
 

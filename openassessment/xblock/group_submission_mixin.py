@@ -61,6 +61,7 @@ class GroupSubmissionMixin(object):
         if len(project['parts']) >= len(assessment['parts']):
             # TODO: We're cheating and just giving the last submission in
             # the project.
+            print "CREATING WORKFLOW ON PROJECT"
             self.create_workflow(project["rep_uuid"])
             self.submission_uuid = project["rep_uuid"]
 

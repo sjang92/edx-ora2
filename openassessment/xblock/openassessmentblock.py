@@ -30,6 +30,7 @@ from openassessment.workflow.errors import AssessmentWorkflowError
 from openassessment.xblock.student_training_mixin import StudentTrainingMixin
 from openassessment.xblock.validation import validator
 from openassessment.xblock.resolve_dates import resolve_dates, DISTANT_PAST, DISTANT_FUTURE
+from openassessment.xblock.group_assessment_mixin import GroupAssessmentMixin
 
 
 logger = logging.getLogger(__name__)
@@ -113,7 +114,8 @@ class OpenAssessmentBlock(
     WorkflowMixin,
     StudentTrainingMixin,
     LmsCompatibilityMixin,
-    GroupSubmissionMixin
+    GroupSubmissionMixin,
+    GroupAssessmentMixin
 ):
     """Displays a prompt and provides an area where students can compose a response."""
 

@@ -114,7 +114,6 @@ class AssessmentWorkflow(TimeStampedModel, StatusModel):
             Assessment-module specific errors
         """
         submission_dict = sub_api.get_submission_and_student(submission_uuid)
-
         # Create the workflow and step models in the database
         # For now, set the status to waiting; we'll modify it later
         # based on the first step in the workflow.
@@ -131,7 +130,6 @@ class AssessmentWorkflow(TimeStampedModel, StatusModel):
             for i, step in enumerate(step_names)
         ]
         workflow.steps.add(*workflow_steps)
-
         # Initialize the assessment APIs
         has_started_first_step = False
         for step in workflow_steps:
@@ -156,7 +154,6 @@ class AssessmentWorkflow(TimeStampedModel, StatusModel):
 
                     # Remember that we've already started the first step
                     has_started_first_step = True
-
         # Update the workflow (in case some of the assessment modules are automatically complete)
         # We do NOT pass in requirements, on the assumption that any assessment module
         # that accepts requirements would NOT automatically complete.

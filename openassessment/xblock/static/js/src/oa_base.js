@@ -25,6 +25,7 @@ OpenAssessment.BaseView = function(runtime, element, server) {
 
     // Group Project specific JS.
     this.groupResponseView = new OpenAssessment.GroupResponseView(this.element, this.server, this);
+    this.groupAssessView = new OpenAssessment.GroupView(this.element, this.server, this);
 };
 
 
@@ -83,6 +84,7 @@ OpenAssessment.BaseView.prototype = {
         this.trainingView.load();
         this.peerView.load();
         this.selfView.load();
+        this.groupAssessView.load();
         this.gradeView.load();
         /**
         this.messageView.load() is intentionally omitted. 

@@ -121,6 +121,21 @@ def _create_group_member(student_item, student_name, student_email, group_id, pr
     return member.data
 
 
+def get_group_by_uuid(group_uuid):
+    """
+    Retrieve the group by its UUID.
+
+    Args:
+        group_uuid (str): The UUID for this group.
+
+    Returns:
+        The group.
+
+    """
+    groups = WorkGroup.objects.filter(uuid=group_uuid)
+    if groups:
+        return WorkGroupSerializer(groups[0]).data
+
 def get_group(student_item, project_location=None):
     """
     Return the group this student belongs to for the location and course.

@@ -47,6 +47,23 @@ def create_group_project(student_item):
     return GroupProjectSerializer(new_project).data
 
 
+def get_project_by_submission_uuid(submission_uuid):
+    """
+    Get a project by its representative submission UUID.
+
+    Args:
+        submission_uuid (str): The representative submission for this project.
+
+    Returns:
+        The project, serialized. If no submission UUID is matched, returns
+        None.
+
+    """
+    projects = GroupProject.objects.filter(rep_uuid=submission_uuid)
+    if projects:
+        return GroupProjectSerializer(projects[0]).data
+
+
 def get_group_project(student_item):
     """
     Retrieves a group project for the given student and group.

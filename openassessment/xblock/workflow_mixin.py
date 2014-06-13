@@ -77,6 +77,11 @@ class WorkflowMixin(object):
                 "num_required": len(training_module["examples"])
             }
 
+        group_module = self.get_assessment_module('group-assessment')
+        if group_module:
+            requirements["group"] = {
+                "student_item": self.get_student_item_dict()
+            }
         return requirements
 
     def update_workflow_status(self, submission_uuid=None):
