@@ -37,16 +37,14 @@ def create_group_project(student_item):
         logger.warn(msg)
         raise GroupProjectError(msg)
 
-    project_data = {
-        'group_uuid': group['uuid'],
-        'course_id': student_item['course_id'],
-        'item_id': student_item['item_id']
-    }
-    new_project = GroupProjectSerializer(data=project_data)
-    if not new_project.is_valid():
-        raise GroupProjectError(new_project.errors)
+    # Serializers won't allow nullable fields on creation?
+    new_project = GroupProject.objects.create(
+        group_uuid=group['uuid'],
+        course_id=student_item['course_id'],
+        item_id=student_item['item_id'],
+    )
     new_project.save()
-    return new_project.data
+    return GroupProjectSerializer(new_project).data
 
 
 def get_group_project(student_item):
@@ -106,7 +104,13 @@ def submit_project_part(student_item, order_num, answer):
     new_part = GroupProjectPartSerializer(data=part_data)
     if not new_part.is_valid():
         raise GroupProjectError(new_part.errors)
+
+    if len(project.parts.all()) == 0:
+        project.rep_uuid = submission['uuid']
+        project.save()
+
     new_part.save()
+
     return new_part.data
 
 

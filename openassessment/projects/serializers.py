@@ -31,6 +31,7 @@ class GroupProjectSerializer(serializers.ModelSerializer):
         model = GroupProject
         fields = (
             'uuid',
+            'rep_uuid',
             'group_uuid',
             'item_id',
             'course_id',

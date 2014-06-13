@@ -157,11 +157,13 @@ ORA2_ASSESSMENTS = {
     'peer': 'openassessment.assessment.api.peer',
     'self': 'openassessment.assessment.api.self',
     'training': 'openassessment.assessment.api.student_training',
+    'group': 'openassessment.assessment.api.group',
+    'project': 'openassessment.assessment.api.project'
 }
 
 # If peer-assessment provides a score, use that;
 # otherwise fall back to self-assessment.
-ORA2_ASSESSMENT_SCORE_PRIORITY = ['peer', 'self']
+ORA2_ASSESSMENT_SCORE_PRIORITY = ['peer', 'self', 'project']
 
 # Celery configuration
 # Note: Version 3.1 of Celery includes Django support, but since we're using

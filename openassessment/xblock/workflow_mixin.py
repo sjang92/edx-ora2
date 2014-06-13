@@ -17,6 +17,8 @@ class WorkflowMixin(object):
         "self-assessment": "self",
         "peer-assessment": "peer",
         "student-training": "training",
+        "group-assessment": "group",
+        "group-project-assessment": "project",
     }
 
     @XBlock.json_handler

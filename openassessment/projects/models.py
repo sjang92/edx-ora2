@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 class GroupProject(models.Model):
 
     uuid = UUIDField(version=1, db_index=True, unique=True)
+    rep_uuid = models.CharField(max_length=36, db_index=True, null=True)
     group_uuid = models.CharField(max_length=36, db_index=True)
     item_id = models.CharField(max_length=128, db_index=True)
     course_id = models.CharField(max_length=40, db_index=True)

@@ -1,6 +1,5 @@
-import dateutil
 import logging
-
+import copy
 from django.utils.translation import ugettext as _
 from xblock.core import XBlock
 
@@ -62,8 +61,8 @@ class GroupSubmissionMixin(object):
         if len(project['parts']) >= len(assessment['parts']):
             # TODO: We're cheating and just giving the last submission in
             # the project.
-            self.create_workflow(part["submission_uuid"])
-            self.submission_uuid = part["submission_uuid"]
+            self.create_workflow(project["rep_uuid"])
+            self.submission_uuid = project["rep_uuid"]
 
         # Emit analytics event...
         self.runtime.publish(
@@ -131,7 +130,7 @@ class GroupSubmissionMixin(object):
 
         assessment = self.get_assessment_module('group-project-assessment')
         if assessment:
-            context['parts'] = assessment['parts']
+            context['parts'] = copy.deepcopy(assessment['parts'])
 
         group = group_api.get_group(student_item)
         if not group:
