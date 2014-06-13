@@ -49,6 +49,10 @@ def serialize_content_to_xml(group_block, root):
     prompt = etree.SubElement(root, 'prompt')
     prompt.text = unicode(group_block.prompt)
 
+    # Group associated location
+    location = etree.SubElement(root, 'explicit-location')
+    location.text = unicode(group_block.explicit_location)
+
 
 def serialize_content(group_block):
     """
@@ -106,11 +110,17 @@ def update_from_xml(group_block, root):
     else:
         prompt = _safe_get_text(prompt_el)
 
+    explicit_location = None
+    explicit_location_el = root.find('explicit-location')
+    if explicit_location_el is not None:
+        explicit_location = _safe_get_text(explicit_location_el)
+
     # If we've gotten this far, then we've successfully parsed the XML
     # and validated the contents.  At long last, we can safely update the XBlock.
     group_block.title = title
     group_block.prompt = prompt
     group_block.member_count = member_count
+    group_block.explicit_location = explicit_location
     return group_block
 
 

@@ -146,6 +146,33 @@ OpenAssessment.Server.prototype = {
         }).promise();
     },
 
+    submitProjectPart: function(submission, order) {
+        var url = this.url('submit_project_part');
+        return $.Deferred(function(defer) {
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: JSON.stringify(
+                    {
+                        submission: submission,
+                        order: order
+                    }
+                )
+            }).done(function(data) {
+                    var success = data[0];
+                    if (success) {
+                        defer.resolveWith(this, []);
+                    }
+                    else {
+                        var errorMsg = data[1];
+                        defer.rejectWith(this, [errorMsg]);
+                    }
+                }).fail(function(data) {
+                    defer.rejectWith(this, ["AJAX", gettext("This response could not be submitted.")]);
+                });
+        }).promise();
+    },
+
     /**
     Save a response without submitting it.
 

@@ -9,6 +9,7 @@ TEST_APPS = (
     'openassessment',
     'openassessment.assessment',
     'openassessment.groups',
+    'openassessment.projects',
     'openassessment.workflow',
     'openassessment.xblock',
 )

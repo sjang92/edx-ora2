@@ -6,6 +6,7 @@ PACKAGES = [
     'openassessment.assessment',
     'openassessment.groups',
     'openassessment.group_xblock',
+    'openassessment.projects',
     'openassessment.workflow',
     'openassessment.management',
     'openassessment.xblock'

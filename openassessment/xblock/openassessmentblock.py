@@ -21,11 +21,11 @@ from openassessment.xblock.peer_assessment_mixin import PeerAssessmentMixin
 from openassessment.xblock.lms_mixin import LmsCompatibilityMixin
 from openassessment.xblock.self_assessment_mixin import SelfAssessmentMixin
 from openassessment.xblock.submission_mixin import SubmissionMixin
+from openassessment.xblock.group_submission_mixin import GroupSubmissionMixin
 from openassessment.xblock.studio_mixin import StudioMixin
 from openassessment.xblock.xml import update_from_xml, serialize_content_to_xml
 from openassessment.xblock.staff_info_mixin import StaffInfoMixin
 from openassessment.xblock.workflow_mixin import WorkflowMixin
-from openassessment.workflow import api as workflow_api
 from openassessment.workflow.errors import AssessmentWorkflowError
 from openassessment.xblock.student_training_mixin import StudentTrainingMixin
 from openassessment.xblock.validation import validator
@@ -41,6 +41,24 @@ UI_MODELS = {
         "class_id": "openassessment__response",
         "navigation_text": "Your response to this assignment",
         "title": "Your Response"
+    },
+    "group-submission": {
+        "name": "group-submission",
+        "class_id": "openassessment__group_response",
+        "navigation_text": "Your group's responses to this assignment",
+        "title": "Your Group's Responses"
+    },
+    "group-assessment": {
+        "name": "group-assessment",
+        "class_id": "openassessment__group-assessment",
+        "navigation_text": "Your assessment(s) of your group members",
+        "title": "Assess Group Members"
+    },
+    "group-project-assessment": {
+        "name": "group-project-assessment",
+        "class_id": "openassessment__group-project-assessment",
+        "navigation_text": "Your assessment(s) of peer group projects",
+        "title": "Assess Peers' Group Projects"
     },
     "student-training": {
         "name": "student-training",
@@ -72,6 +90,8 @@ VALID_ASSESSMENT_TYPES = [
     "student-training",
     "peer-assessment",
     "self-assessment",
+    "group-assessment",
+    "group-project-assessment",
 ]
 
 
@@ -92,7 +112,8 @@ class OpenAssessmentBlock(
     StaffInfoMixin,
     WorkflowMixin,
     StudentTrainingMixin,
-    LmsCompatibilityMixin
+    LmsCompatibilityMixin,
+    GroupSubmissionMixin
 ):
     """Displays a prompt and provides an area where students can compose a response."""
 
@@ -229,6 +250,7 @@ class OpenAssessmentBlock(
             "rubric_criteria": self.rubric_criteria,
             "rubric_assessments": ui_models,
             "show_staff_debug_info": self.is_course_staff and not self.in_studio_preview,
+            "is_group_project": self.is_group_project
         }
 
         template = get_template("openassessmentblock/oa_base.html")
@@ -238,6 +260,19 @@ class OpenAssessmentBlock(
         frag.add_javascript(load("static/js/openassessment.min.js"))
         frag.initialize_js('OpenAssessmentBlock')
         return frag
+
+    @property
+    def is_group_project(self):
+        """
+        Check if this is a group project. Can be determined based on the
+        configured Assessment Modules.
+
+        Returns:
+            bool. True if this is a group project.
+
+        """
+        assessment = self.get_assessment_module('group-project-assessment')
+        return bool(assessment)
 
     @property
     def is_course_staff(self):
@@ -275,7 +310,8 @@ class OpenAssessmentBlock(
         XBlock configuration.
 
         """
-        ui_models = [UI_MODELS["submission"]]
+        sub = UI_MODELS['group-submission'] if self.is_group_project else UI_MODELS['submission']
+        ui_models = [sub]
         for assessment in self.valid_assessments:
             ui_model = UI_MODELS[assessment["name"]]
             ui_models.append(dict(assessment, **ui_model))
@@ -314,6 +350,10 @@ class OpenAssessmentBlock(
             (
                 "OpenAssessmentBlock Promptless Rubric",
                 load('static/xml/promptless_rubric_example.xml')
+            ),
+            (
+                "OpenAssessmentBlock Group Project Rubric",
+                load('static/xml/group_project_example.xml')
             ),
         ]
 

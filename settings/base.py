@@ -132,6 +132,7 @@ INSTALLED_APPS = (
     'submissions',
     'openassessment',
     'openassessment.groups',
+    'openassessment.projects',
     'openassessment.workflow',
     'openassessment.assessment',
 )

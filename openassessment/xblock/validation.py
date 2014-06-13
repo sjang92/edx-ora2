@@ -58,7 +58,7 @@ def _is_valid_assessment_sequence(assessments):
         bool
 
     """
-    valid_sequences = [
+    general_sequences = [
         ['self-assessment'],
         ['peer-assessment'],
         ['peer-assessment', 'self-assessment'],
@@ -67,6 +67,14 @@ def _is_valid_assessment_sequence(assessments):
         ['student-training', 'peer-assessment', 'self-assessment'],
         ['student-training', 'self-assessment', 'peer-assessment'],
     ]
+
+    group_sequences = [
+        ['group-assessment'],
+        ['group-project-assessment'],
+        ['group-assessment', 'group-project-assessment']
+    ]
+
+    valid_sequences = general_sequences + group_sequences
 
     sequence = [asmnt.get('name') for asmnt in assessments]
     return sequence in valid_sequences
@@ -122,6 +130,10 @@ def validate_assessments(assessments, current_assessments, is_released):
 
             if must_grade < must_be_graded_by:
                 return (False, _('The "must_grade" value must be greater than or equal to the "must_be_graded_by" value.'))
+
+        if assessment_dict.get('name') == 'group-project-assessment':
+            # TODO: validate parts / rubrics
+            pass
 
     if is_released:
         if len(assessments) != len(current_assessments):

@@ -1,0 +1,122 @@
+<openassessment>
+    <title>
+        Pirates or Ninjas. CHOOSE.
+    </title>
+    <rubric>
+        <prompt>
+            Which are better: Ninjas or Pirates? Provide the required submissions to complete the project.
+        </prompt>
+        <criterion>
+            <name>hard-working</name>
+            <prompt>How much effort did this group member put forth?</prompt>
+            <option points="0">
+                <name>Lazy</name>
+                <explanation>Didn't do much of anything.</explanation>
+            </option>
+            <option points="1">
+                <name>OK</name>
+                <explanation>Did some work.</explanation>
+            </option>
+        </criterion>
+        <criterion>
+            <name>Quality</name>
+            <prompt>Did this group member submit quality work</prompt>
+            <option points="0">
+                <name>No</name>
+                <explanation>Bad work.</explanation>
+            </option>
+            <option points="1">
+                <name>Yes</name>
+                <explanation>Quality work submitted for team.</explanation>
+            </option>
+        </criterion>
+        <feedbackprompt>
+            Please provide additional free-form feedback on this submission.
+
+            This feedback is completely optional.
+        </feedbackprompt>
+    </rubric>
+    <assessments>
+        <assessment name="group-assessment"
+                    start="2013-12-20T19:00-7:00"
+                    due="2020-12-21T22:22-7:00"/>
+        <assessment name="group-project-assessment"
+                    start="2013-12-20T19:00-7:00"
+                    due="2020-12-21T22:22-7:00">
+            <parts>
+                <part order_num="0">
+                    <rubric>
+                        <prompt>
+                            Write a clear argument for pirates or ninjas. Be careful.
+                        </prompt>
+                        <criterion>
+                            <name>Spelling and Grammar</name>
+                            <prompt>How was spelling and grammar?</prompt>
+                            <option points="0">
+                                <name>Terrible</name>
+                                <explanation>No idea what was going on.</explanation>
+                            </option>
+                            <option points="1">
+                                <name>Great</name>
+                                <explanation>Aside from the occassional "Yarrr", it was all good.</explanation>
+                            </option>
+                        </criterion>
+                        <criterion>
+                            <name>References</name>
+                            <prompt>How much did the team geek out in their explanation.</prompt>
+                            <option points="0">
+                                <name>Boring</name>
+                                <explanation>No geeky references to film and media.</explanation>
+                            </option>
+                            <option points="1">
+                                <name>Great</name>
+                                <explanation>Plenty of geeky references.</explanation>
+                            </option>
+                        </criterion>
+                        <feedbackprompt>
+                            Please provide additional free-form feedback on this submission.
+
+                            This feedback is completely optional.
+                        </feedbackprompt>
+                    </rubric>
+                </part>
+                <part order_num="1">
+                    <rubric>
+                        <prompt>
+                            Provide a link to an image, youtube clip, or gif that supports your appreciate for either pirates or ninjas.
+                        </prompt>
+                        <criterion>
+                            <name>Sway</name>
+                            <prompt>Does the media bolster the argument?</prompt>
+                            <option points="0">
+                                <name>Unconvincing</name>
+                                <explanation>Did not alter my opinion.</explanation>
+                            </option>
+                            <option points="1">
+                                <name>Convincing</name>
+                                <explanation>Raising an excellent point.</explanation>
+                            </option>
+                        </criterion>
+                        <criterion>
+                            <name>Hilarity</name>
+                            <prompt>Was it worth it just for the sake of hilarity?</prompt>
+                            <option points="0">
+                                <name>Eh</name>
+                                <explanation>Not that funny.</explanation>
+                            </option>
+                            <option points="1">
+                                <name>Lol</name>
+                                <explanation>Pretty funny.</explanation>
+                            </option>
+                        </criterion>
+                        <feedbackprompt>
+                            Please provide additional free-form feedback on this submission.
+
+                            This feedback is completely optional.
+                        </feedbackprompt>
+                    </rubric>
+                </part>
+            </parts>
+        </assessment>
+    </assessments>
+</openassessment>

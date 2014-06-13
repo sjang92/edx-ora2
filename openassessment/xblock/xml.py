@@ -433,10 +433,42 @@ def _parse_assessments_xml(assessments_root):
         if assessment_dict['name'] == 'student-training':
             assessment_dict['examples'] = _parse_examples_xml(examples)
 
+        parts = assessment.find('parts')
+        if assessment_dict['name'] == 'group-project-assessment':
+            assessment_dict['parts'] = _parse_group_project_parts(parts)
+
         # Update the list of assessments
         assessments_list.append(assessment_dict)
 
     return assessments_list
+
+
+def _parse_group_project_parts(parts_root):
+    """
+    Parse group project parts.
+    """
+    parts = parts_root.findall('part')
+    parts_list = []
+    for part in parts:
+        part_dict = {}
+        if 'order_num' in part.attrib:
+            part_dict['order_num'] = int(part.get('order_num'))
+        else:
+            raise UpdateFromXmlError("Every project part must have an order_num")
+
+        rubric_el = part.find('rubric')
+        if rubric_el is not None:
+            part_dict['rubric'] = _parse_rubric_xml(rubric_el)
+        else:
+            raise UpdateFromXmlError("Every project part must have a rubric")
+        parts_list.append(part_dict)
+
+    return parts_list
+
+
+def _serialize_group_project_parts():
+    # TODO: Serialize
+    pass
 
 
 def _serialize_training_examples(examples, assessment_el):

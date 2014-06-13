@@ -1,0 +1,80 @@
+{% load tz %}
+{% load i18n %}
+{% spaceless %}
+    {% block list_item %}
+        <li id="openassessment__group_response" class="openassessment__steps__step step--response ui-toggle-visibility">
+    {% endblock %}
+
+<header class="step__header ui-toggle-visibility__control">
+    <h2 class="step__title">
+        <span class="step__counter"></span>
+            <span class="wrapper--copy">
+                <span class="step__label">{% trans "Your Group's Responses" %}</span>
+                {% if submission_start %}
+                    <span class="step__deadline">
+                    {% blocktrans with start_date=submission_start|utc|date:"N j, Y H:i e" time_until=submission_start|timeuntil %}available <span class="date">{{ start_date }} (in {{ time_until }})</span>{% endblocktrans %}
+                </span>
+                {% elif submission_due %}
+                    <span class="step__deadline">
+                    {% blocktrans with due_date=submission_due|utc|date:"N j, Y H:i e" time_until=submission_due|timeuntil %}due <span class="date"> {{ due_date }} (in {{ time_until }})</span>{% endblocktrans %}
+                </span>
+                {% endif %}
+            </span>
+    </h2>
+
+    {%  block title %}
+        <span class="step__status">
+            <span class="step__status__label">{% trans "This step's status" %}:</span>
+            <span class="step__status__value">
+                <span class="copy">{% trans "In Progress" %}</span>
+            </span>
+        </span>
+    {% endblock %}
+</header>
+
+{% block body %}
+    <div class="ui-toggle-visibility__content">
+        {% for part in parts %}
+        <div class="wrapper--step__content">
+            <div class="step__instruction">
+                <p>{{ part.rubric.prompt }}</p>
+            </div>
+            <div class="step__content">
+                <form id="response__submission_{{ part.order_num }}" class="response__submission">
+                    <ol class="list list--fields response__submission__content">
+                        <li class="field field--textarea submission__answer" id="submission__answer">
+                            <label class="sr" for="submission__answer__value">{{ part.rubric.prompt }}</label>
+                            <textarea
+                                    id="submission__answer__value"
+                                    placeholder=""
+                                    maxlength="100000"
+                                    >{{ part.answer }}</textarea>
+                            <div id="response__order_num">{{ part.order_num }}</div>
+                            <span class="tip">{% trans "You may continue to work on your response until you submit it." %}</span>
+                        </li>
+                    </ol>
+                </form>
+            </div>
+
+            <div class="step__actions">
+                <div class="message message--inline message--error message--error-server">
+                    <h3 class="message__title">{% trans "We could not submit your response" %}</h3>
+                    <div class="message__content"></div>
+                </div>
+
+                <ul class="list list--actions">
+                    <li class="list--actions__item">
+                        <a aria-role="button" href="#" id="step--response__submit"
+                           class="action action--submit step--response__submit {{ submit_enabled|yesno:",is--disabled" }}">
+                            <span class="copy">{% trans "Submit your response and move to the next step" %}</span>
+                            <i class="ico icon-caret-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+</li>
+{% endspaceless %}

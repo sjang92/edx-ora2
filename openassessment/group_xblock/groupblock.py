@@ -53,6 +53,12 @@ class GroupBlock(XBlock, LmsCompatibilityMixin):
         help="The course_id associated with this prompt (until we can get it from runtime)."
     )
 
+    explicit_location = String(
+        default=None,
+        scope=Scope.content,
+        help="Explicit location this group is bound to. Typically an ORA2 project."
+    )
+
     def get_student_item_dict(self):
         """Create a student_item_dict from our surrounding context.
 
@@ -141,13 +147,15 @@ class GroupBlock(XBlock, LmsCompatibilityMixin):
                 student_item_dict,
                 student_name,
                 student_email,
-                self.member_count
+                self.member_count,
+                project_location=self.explicit_location
             )
             if not group:
                 group = api.create_group(
                     student_item_dict,
                     student_name,
-                    student_email
+                    student_email,
+                    project_location=self.explicit_location
                 )
         except WorkGroupError as err:
             return "fail", err.message
