@@ -179,6 +179,17 @@ def validate_training_examples(rubric, examples):
         logger.warning("Could not parse serialized rubric", exc_info=True)
         return [_(u"Could not parse serialized rubric")]
 
+    # Check that at least one criterion in the rubric has options
+    # If this is not the case (that is, if all rubric criteria are written feedback only),
+    # then it doesn't make sense to do student training.
+    criteria_without_options = [
+        criterion_name
+        for criterion_name, criterion_option_list in criteria_options.iteritems()
+        if len(criterion_option_list) == 0
+    ]
+    if len(set(criteria_options.keys()) - set(criteria_without_options)) == 0:
+        return [_("When using student training, the rubric must contain at least one criterion with options")]
+
     # Check each example
     for order_num, example_dict in enumerate(examples, start=1):
 
@@ -219,7 +230,9 @@ def validate_training_examples(rubric, examples):
                     errors.append(msg)
 
             # Check for missing criteria
-            for missing_criterion in set(criteria_options.keys()) - set(options_selected.keys()):
+            # Ignore options 
+            all_example_criteria = set(options_selected.keys() + criteria_without_options)
+            for missing_criterion in set(criteria_options.keys()) - all_example_criteria:
                 msg = _(
                     u"Example {example_number} is missing an option "
                     u"for \"{criterion_name}\""

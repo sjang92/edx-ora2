@@ -164,7 +164,9 @@ class Criterion(models.Model):
     @property
     def points_possible(self):
         """The total number of points that could be earned in this Criterion."""
-        return max(option.points for option in self.options.all())
+        # By convention, criteria with 0 options (only feedback) have 0 points possible
+        option_points = [option.points for option in self.options.all()]
+        return max(option_points) if option_points else 0
 
 
 class CriterionOption(models.Model):
@@ -253,6 +255,32 @@ class RubricIndex(object):
             for option in reversed(options)
         }
 
+    def find_criterion(self, criterion_name):
+        """
+        Find a criterion by its name.
+
+        Args:
+            criterion_name (unicode): The name of the criterion to retrieve.
+
+        Returns:
+            Criterion
+
+        Raises:
+            InvalidRubricSelection
+
+        """
+        if criterion_name not in self._criteria_index:
+            msg = (
+                u"Could not find criterion named \"{criterion}\" "
+                u"in the rubric with content hash \"{rubric_hash}\""
+            ).format(
+                criterion=criterion_name,
+                rubric_hash=self.rubric.content_hash
+            )
+            raise InvalidRubricSelection(msg)
+        else:
+            return self._criteria_index[criterion_name]
+
     def find_option(self, criterion_name, option_name):
         """
         Find a rubric option by criterion name and option name.
@@ -315,6 +343,17 @@ class RubricIndex(object):
             # order numbers when we created the index.
             return self._option_points_index[key]
 
+    @property
+    def criteria_names(self):
+        """
+        Return a list of all criteria names in the rubric.
+
+        Returns:
+            set of unicode
+
+        """
+        return set(self._criteria_index.keys())
+
     def find_missing_criteria(self, criteria_names):
         """
         Return a set of criteria names in the rubric that
@@ -327,7 +366,21 @@ class RubricIndex(object):
             set of unicode: The missing criteria
 
         """
-        return set(self._criteria_index.keys()) - set(criteria_names)
+        return set(self.criteria_names) - set(criteria_names)
+
+    def find_criteria_without_options(self):
+        """
+        Return a set of `Criterion` models that do not have options.
+        (only written feedback).
+
+        Returns:
+            set of `Criterion`
+
+        """
+        return set(
+            criterion for criterion in self._criteria_index.values()
+            if len(criterion.options.all()) == 0
+        )
 
 
 class Assessment(models.Model):
@@ -515,9 +568,9 @@ class Assessment(models.Model):
 
         scores = defaultdict(list)
         for assessment in assessments:
-            for part in assessment.parts.all().select_related("option__criterion"):
-                criterion_name = part.option.criterion.name
-                scores[criterion_name].append(part.option.points)
+            for part in assessment.parts.all().select_related():
+                criterion_name = part.criterion.name
+                scores[criterion_name].append(part.points_earned)
 
         cache.set(cache_key, scores)
         return scores
@@ -538,7 +591,15 @@ class AssessmentPart(models.Model):
     MAX_FEEDBACK_SIZE = 1024 * 100
 
     assessment = models.ForeignKey(Assessment, related_name='parts')
-    option = models.ForeignKey(CriterionOption, related_name="+")
+
+    # Assessment parts are usually associated with an option
+    # (representing the point value selected for a particular criterion)
+    # It's possible, however, for an assessment part to contain
+    # only written feedback, with no point value.
+    # In this case, the assessment part is associated with a criterion,
+    # but not with any option (the `option` field is set to null).
+    criterion = models.ForeignKey(Criterion, related_name="+")
+    option = models.ForeignKey(CriterionOption, null=True, related_name="+")
 
     # Free-form text feedback for the specific criterion
     # Note that the `Assessment` model also has a feedback field,
@@ -550,11 +611,12 @@ class AssessmentPart(models.Model):
 
     @property
     def points_earned(self):
-        return self.option.points
+        # By convention, an assessment with no options (only feedback) earns 0 points.
+        return self.option.points if self.option is not None else 0
 
     @property
     def points_possible(self):
-        return self.option.criterion.points_possible
+        return self.criterion.points_possible
 
     @classmethod
     def create_from_option_names(cls, assessment, selected, feedback=None):
@@ -577,25 +639,57 @@ class AssessmentPart(models.Model):
             DatabaseError
 
         """
-        if feedback is None:
-            feedback = {}
-
+        # Use the rubric index so we can retrieve options/criteria
+        # without repeatedly hitting the database.
+        # This will also validate our selections against the rubric.
         rubric_index = assessment.rubric.index
+
+        # If the assessment type doesn't explicitly provide feedback,
+        # then fill in feedback-only criteria with an empty string for feedback.
+        if feedback is None:
+            feedback = {
+                criterion.name: u""
+                for criterion in rubric_index.find_criteria_without_options()
+            }
 
         # Validate that we have selections for all criteria
         # This will raise an exception if we're missing any criteria
-        cls._check_has_all_criteria(rubric_index, selected)
+        cls._check_has_all_criteria(rubric_index, set(selected.keys() + feedback.keys()))
 
-        # Create assessment parts for each criterion and associate them with the assessment
+        # Retrieve the criteria/option/feedback for criteria that have options.
         # Since we're using the rubric's index, we'll get an `InvalidRubricSelection` error
         # if we select an invalid criterion/option.
+        assessment_parts = [
+            {
+                'criterion': rubric_index.find_criterion(criterion_name),
+                'option': rubric_index.find_option(criterion_name, option_name),
+                'feedback': feedback.get(criterion_name, u"")[0:cls.MAX_FEEDBACK_SIZE],
+            }
+            for criterion_name, option_name in selected.iteritems()
+        ]
+
+        # Some criteria may have feedback but no options, only feedback.
+        # For these, we set `option` to None, indicating that the assessment part
+        # is not associated with any option, only a criterion.
+        for criterion_name, feedback_text in feedback.iteritems():
+            if criterion_name not in selected:
+                assessment_parts.append({
+                    'criterion': rubric_index.find_criterion(criterion_name),
+                    'option': None,
+                    'feedback': feedback_text[0:cls.MAX_FEEDBACK_SIZE]
+                })
+
+        # Create assessment parts for each criterion and associate them with the assessment
+        # We use the dictionary we created earlier, which may have null options
+        # for feedback-only assessment parts.
         return cls.objects.bulk_create([
             cls(
                 assessment=assessment,
-                option=rubric_index.find_option(criterion_name, option_name),
-                feedback=feedback.get(criterion_name, u"")[0:cls.MAX_FEEDBACK_SIZE]
+                criterion=assessment_part['criterion'],
+                option=assessment_part['option'],
+                feedback=assessment_part['feedback']
             )
-            for criterion_name, option_name in selected.iteritems()
+            for assessment_part in assessment_parts
         ])
 
     @classmethod
@@ -621,29 +715,51 @@ class AssessmentPart(models.Model):
         """
         rubric_index = assessment.rubric.index
 
-        # Validate that we have selections for all criteria
-        # This will raise an exception if we're missing any criteria
-        cls._check_has_all_criteria(rubric_index, selected)
-
-        # Create assessment parts for each criterion and associate them with the assessment
+        # Retrieve the criteria/option/feedback for criteria that have options.
         # Since we're using the rubric's index, we'll get an `InvalidRubricSelection` error
         # if we select an invalid criterion/option.
+        assessment_parts = [
+            {
+                'criterion': rubric_index.find_criterion(criterion_name),
+                'option': rubric_index.find_option_for_points(criterion_name, option_points),
+            }
+            for criterion_name, option_points in selected.iteritems()
+        ]
+
+        # Add in feedback-only criteria
+        # (criteria that have 0 options)
+        for criterion in rubric_index.find_criteria_without_options():
+            assessment_parts.append({
+                'criterion': criterion,
+                'option': None
+            })
+
+        # Validate that we have selections for all criteria
+        # This will raise an exception if we're missing any criteria
+        cls._check_has_all_criteria(rubric_index, set(
+            part['criterion'].name for part in assessment_parts
+        ))
+
+        # Create assessment parts for each criterion and associate them with the assessment
+        # Since we're not accepting written feedback, set all feedback to an empty string.
         return cls.objects.bulk_create([
             cls(
                 assessment=assessment,
-                option=rubric_index.find_option_for_points(criterion_name, option_points)
+                criterion=assessment_part['criterion'],
+                option=assessment_part['option'],
+                feedback=u""
             )
-            for criterion_name, option_points in selected.iteritems()
+            for assessment_part in assessment_parts
         ])
 
     @classmethod
-    def _check_has_all_criteria(cls, rubric_index, selected):
+    def _check_has_all_criteria(cls, rubric_index, selected_criteria):
         """
         Verify that we've selected options for all criteria in the rubric.
 
         Args:
             rubric_index (RubricIndex): The index of the rubric's data.
-            selected (dict): Dictionary mapping criterion names to option names or points.
+            selected_criteria (list): list of criterion names
 
         Returns:
             None
@@ -651,7 +767,7 @@ class AssessmentPart(models.Model):
         Raises:
             InvalidRubricSelection
         """
-        missing_criteria = rubric_index.find_missing_criteria(selected.keys())
+        missing_criteria = rubric_index.find_missing_criteria(selected_criteria)
         if len(missing_criteria) > 0:
             msg = u"Missing selections for criteria: {missing}".format(missing=missing_criteria)
             raise InvalidRubricSelection(msg)

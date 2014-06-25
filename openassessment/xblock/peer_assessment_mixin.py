@@ -80,7 +80,8 @@ class PeerAssessmentMixin(object):
                 )
 
                 # Emit analytics event...
-                self._publish_peer_assessment_event(assessment)
+                self.publish_assessment_event("openassessmentblock.peer_assess", assessment)
+
             except (PeerAssessmentRequestError, PeerAssessmentWorkflowError):
                 logger.warning(
                     u"Peer API error for submission UUID {}".format(self.submission_uuid),
@@ -259,42 +260,6 @@ class PeerAssessmentMixin(object):
             logger.exception(err)
 
         return peer_submission
-
-    def _publish_peer_assessment_event(self, assessment):
-        """
-        Emit an analytics event for the peer assessment.
-
-        Args:
-            assessment (dict): The serialized assessment model.
-
-        Returns:
-            None
-
-        """
-        self.runtime.publish(
-            self,
-            "openassessmentblock.peer_assess",
-            {
-                "feedback": assessment["feedback"],
-                "rubric": {
-                    "content_hash": assessment["rubric"]["content_hash"],
-                },
-                "scorer_id": assessment["scorer_id"],
-                "score_type": assessment["score_type"],
-                "scored_at": assessment["scored_at"],
-                "submission_uuid": assessment["submission_uuid"],
-                "parts": [
-                    {
-                        "option": {
-                            "name": part["option"]["name"],
-                            "points": part["option"]["points"],
-                        },
-                        "feedback": part["feedback"],
-                    }
-                    for part in assessment["parts"]
-                ]
-            }
-        )
 
     def _clean_criterion_feedback(self, criterion_feedback):
         """
