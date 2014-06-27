@@ -8,7 +8,7 @@
 
             Read for conciseness, clarity of thought, and form.
         </prompt>
-        <criterion>
+        <criterion feedback='required'>
             <name>concise</name>
             <prompt>How concise is it?</prompt>
             <option points="0">
@@ -24,7 +24,7 @@
                 <explanation></explanation>
             </option>
         </criterion>
-        <criterion>
+        <criterion feedback='optional'>
             <name>clear-headed</name>
             <prompt>How clear is the thinking?</prompt>
             <option points="0">

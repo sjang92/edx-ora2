@@ -88,7 +88,7 @@
                                                     </li>
                                                     {% endfor %}
 
-                                                    {% if criterion.feedback == 'optional' %}
+                                                    {% if criterion.feedback == 'optional' or criterion.feedback == 'required' %}
                                                     <li class="answer--feedback">
                                                         <div class="wrapper--input">
                                                             <label for="assessment__rubric__question--{{ criterion.order_num }}__feedback" class="answer__label">{% trans "Comments" %}</label>
@@ -98,6 +98,7 @@
                                                                 value="{{ criterion.name }}"
                                                                 name="{{ criterion.name }}"
                                                                 maxlength="300"
+                                                                {% if criterion.feedback == 'required' %}required{% endif %}
                                                                 >
                                                             </textarea>
                                                         </div>

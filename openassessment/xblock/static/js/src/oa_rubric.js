@@ -102,10 +102,30 @@ OpenAssessment.Rubric.prototype = {
             function() {
                 var numChecked = $('input[type=radio]:checked', this).length;
                 var numAvailable = $('.field--radio.assessment__rubric__question', this).length;
-                var canSubmit = numChecked == numAvailable;
+                var canSubmit = numChecked == numAvailable && this.completedRequiredComments();
+                debugger;
                 callback(canSubmit);
             }
         );
+    },
+
+    /**
+     Checks to see if all required comment fields have been addressed.
+
+     Returns:
+        TRUE if all required comments have been made. FALSE if some are blank.
+
+     **/
+    completedRequiredComments: function() {
+        var commented = true;
+        $(this.element).change(
+            function() {
+                $('textarea[required]').each(function() {
+                    if ($(this).val() == "") commented = false;
+                });
+            }
+        );
+        return commented;
     },
 
     /**

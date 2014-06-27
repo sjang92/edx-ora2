@@ -118,6 +118,9 @@ def _serialize_criteria(criteria_root, criteria_list):
         if criterion.get('feedback') == "optional":
             criterion_el.set('feedback', 'optional')
 
+        if criterion.get('feedback') == 'required':
+            criterion_el.set('feedback', 'required')
+
         # Criterion options
         options_list = criterion.get('options', None)
         if isinstance(options_list, list):
@@ -268,7 +271,7 @@ def _parse_criteria_xml(criteria_root):
 
         # Criterion feedback (disabled or optional)
         criterion_feedback = criterion.get('feedback', 'disabled')
-        if criterion_feedback in ['optional', 'disabled']:
+        if criterion_feedback in ['optional', 'disabled', 'required']:
             criterion_dict['feedback'] = criterion_feedback
         else:
             raise UpdateFromXmlError(_('Invalid value for "feedback" attribute: if specified, it must be set set to "optional"'))
