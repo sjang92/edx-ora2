@@ -28,6 +28,10 @@ OpenAssessment.GradeView.prototype = {
                 // Load the HTML and install event handlers
                 $('#openassessment__grade', view.element).replaceWith(html);
                 view.installHandlers();
+                // Mathjax should be loaded before Ora2 ajax succeeds
+                if (MathJax != undefined && MathJax != null) {
+                    MathJax.Hub.Queue(['Typeset', MathJax.Hub, $('#openassessment__grade', view.element)[0]]);
+                }
             }
         ).fail(function(errMsg) {
             baseView.showLoadError('grade', errMsg);

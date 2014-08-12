@@ -29,6 +29,9 @@ OpenAssessment.SelfView.prototype = {
                 // Load the HTML and install event handlers
                 $('#openassessment__self-assessment', view.element).replaceWith(html);
                 view.installHandlers();
+                if (MathJax != undefined && MathJax != null) {
+                    MathJax.Hub.Queue(['Typeset', MathJax.Hub, $('#openassessment__self-assessment', view.element)[0]]);
+                }
             }
         ).fail(function(errMsg) {
             view.showLoadError('self-assessment');

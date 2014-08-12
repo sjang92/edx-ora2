@@ -29,6 +29,9 @@ OpenAssessment.StudentTrainingView.prototype = {
                 // Load the HTML and install event handlers
                 $('#openassessment__student-training', view.element).replaceWith(html);
                 view.installHandlers();
+                if (MathJax != undefined && MathJax != null) {
+                    MathJax.Hub.Queue(['Typeset', MathJax.Hub, $('#openassessment__student-training', view.element)[0]]);
+                }
             }
         ).fail(function(errMsg) {
             view.baseView.showLoadError('student-training');

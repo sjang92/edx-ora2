@@ -53,6 +53,9 @@ OpenAssessment.StaffInfoView.prototype = {
             function(html) {
                 // Load the HTML and install event handlers
                 $('#openassessment__student-info', view.element).replaceWith(html);
+                if (MathJax != undefined && MathJax != null) {
+                    MathJax.Hub.Queue(['Typeset', MathJax.Hub, $('#openassessment__student-info', view.element)[0]]);
+                }
             }
         ).fail(function(errMsg) {
                 view.showLoadError('student_info');
