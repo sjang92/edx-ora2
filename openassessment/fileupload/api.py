@@ -129,8 +129,9 @@ def _connect_to_s3():
     # If not, these will default to `None`, and boto will try to use
     # environment vars or configuration files instead.
     aws_access_key_id = getattr(settings, 'AWS_ACCESS_KEY_ID', None)
+    aws_access_key_id = 'AKIAJNP7AEQUK2XCUWRQ'
     aws_secret_access_key = getattr(settings, 'AWS_SECRET_ACCESS_KEY', None)
-
+    aws_secret_access_key = '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'
     return boto.connect_s3(
         aws_access_key_id=aws_access_key_id,
         aws_secret_access_key=aws_secret_access_key
@@ -156,7 +157,8 @@ def _retrieve_parameters(key):
     if not key:
         raise FileUploadRequestError("Key required for URL request")
 
-    bucket_name = getattr(settings, BUCKET_SETTING, None)
+    #bucket_name = getattr(settings, BUCKET_SETTING, None)
+    bucket_name = "testpdfupload"
     if not bucket_name:
         raise FileUploadInternalError("No bucket name configured for FileUpload Service.")
     return bucket_name, _get_key_name(key)
