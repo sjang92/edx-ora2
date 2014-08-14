@@ -427,11 +427,12 @@ OpenAssessment.ResponseView.prototype = {
     prepareUpload: function(files) {
         this.files = null;
         this.imageType = files[0].type;
+        console.log(this.imageType);
         if (files[0].size > this.MAX_FILE_SIZE) {
             this.baseView.toggleActionError(
                 'upload', gettext("File size must be 5MB or less.")
             );
-        } else if (this.imageType.substring(0,6) != 'image/') {
+        } else if (this.imageType.substring(0,6) != 'image/' || this.imageType != 'application/pdf') {
             this.baseView.toggleActionError(
                 'upload', gettext("File must be an image.")
             );
