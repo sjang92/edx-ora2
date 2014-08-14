@@ -189,7 +189,8 @@ class SubmissionMixin(object):
             return {'success': False, 'msg': self._(u"Must specify contentType.")}
         content_type = data['contentType']
 
-        if not content_type.startswith('image/'):
+
+        if not content_type.startswith('image/') or not content_type == 'application/pdf':
             return {'success': False, 'msg': self._(u"contentType must be an image.")}
 
         try:
