@@ -88,6 +88,7 @@ def get_upload_url(key, content_type):
         logger.exception(
             u"An internal exception occurred while generating an upload URL."
         )
+        print ex
         raise FileUploadInternalError(ex)
 
 
@@ -128,9 +129,9 @@ def _connect_to_s3():
     # Try to get the AWS credentials from settings if they are available
     # If not, these will default to `None`, and boto will try to use
     # environment vars or configuration files instead.
-    aws_access_key_id = getattr(settings, 'AWS_ACCESS_KEY_ID', None)
+    #aws_access_key_id = getattr(settings, 'AWS_ACCESS_KEY_ID', None)
     aws_access_key_id = 'AKIAJNP7AEQUK2XCUWRQ'
-    aws_secret_access_key = getattr(settings, 'AWS_SECRET_ACCESS_KEY', None)
+    #aws_secret_access_key = getattr(settings, 'AWS_SECRET_ACCESS_KEY', None)
     aws_secret_access_key = '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'
     return boto.connect_s3(
         aws_access_key_id=aws_access_key_id,
