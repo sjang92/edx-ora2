@@ -36,7 +36,7 @@ OpenAssessment.ResponseView.prototype = {
     MAX_FILE_SIZE: 5242880,
 
     /**
-    Load the response (submission) view.
+    Load the response (submission) view..
     **/
     load: function() {
         var view = this;
